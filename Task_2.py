@@ -5,15 +5,12 @@ def handle_button_press():
     global root, entry_1, entry_2, entry_frozen
     n1 = entry_1.get()
     n2 = entry_2.get()
-    entry_1.delete(0, "end")
-    entry_2.delete(0, "end")
+    nm = int(n1) + int(n2)
     entry_frozen.configure(state="normal")
-    entry_frozen.delete(0, "end")  # удалим оттуда старую строчку
-    entry_frozen.configure(text=f"{n1 + n2}")
+    entry_frozen.delete(0, "end")
+    entry_frozen.insert(0, nm)
     entry_frozen.configure(state="readonly")
 
-    entry_1._activate_placeholder()
-    entry_2._activate_placeholder()
     root.focus_set()
 
 
@@ -42,8 +39,6 @@ entry_2.configure(
 )
 
 
-answer = "ответ"
-
 entry_frozen = ctk.CTkEntry(master=root)
 entry_frozen.configure(
     placeholder_text="ответ",
@@ -51,7 +46,7 @@ entry_frozen.configure(
     font=my_font,
     width=250
 )
-entry_frozen.insert("0", f"{answer}")
+entry_frozen.insert("0", "ответ")
 entry_frozen.configure(state="readonly")
 
 button = ctk.CTkButton(master=root, text="Готово", font=my_font, command=handle_button_press)
