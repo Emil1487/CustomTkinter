@@ -18,7 +18,7 @@ ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
 root = ctk.CTk()
-root.title("Виджет Entry")
+root.title("Task_2")
 root.geometry("500x500")
 my_font = ctk.CTkFont(size=20)
 
