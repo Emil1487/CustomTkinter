@@ -3,34 +3,44 @@ from PIL import Image
 
 
 def handler(i, j):
-    global counter, matrix_lbls
-    if counter % 2 != 1:
-        lbl_ij = matrix_lbls[i][j]
-        lbl_ij.configure(image=image_ctk_x)
+    global counter, game_state
+    if game_state[i][j] != 0 or game_state[i][j] != 0:
+        return
+    if counter % 2 == 0:
+        matrix_lbls[i][j].configure(image=image_ctk_x)
+        game_state[i][j] = 1
     else:
-        lbl_ij = matrix_lbls[i][j]
-        lbl_ij.configure(image=image_ctk_O)
+        matrix_lbls[i][j].configure(image=image_ctk_O)
+        game_state[i][j] = -1
     counter += 1
-    x = 0
+    winner = check_winner(game_state)
+    if winner == 1:
+        label.configure(text="Последняя победа: \n победа X")
+        handler_reset()
+    elif winner == -1:
+        label.configure(text="Последняя победа: \n победа 0")
+        handler_reset()
+
+
+def check_winner(state):
     for i in range(3):
-        for j in range(3):
-            lbl_ij = matrix_lbls[i][j]
-            if lbl_ij.image == image_ctk_x:
-                x += 1
-            elif lbl_ij.image == image_ctk_O:
-                x -= 1
-        if x == 3:
-            print("X win")
-        if x == -3:
-            print("O win")
+        if abs(sum(state[i])) == 3:
+            return state[i][0]
+        if abs(state[0][i] + state[1][i] + state[2][i]) == 3:
+            return state[0][i]
+    if abs(state[0][0] + state[1][1] + state[2][2]) == 3:
+        return state[0][0]
+    if abs(state[0][2] + state[1][1] + state[2][0]) == 3:
+        return state[0][2]
+    return 0
 
 def handler_reset():
-    global counter, matrix_lbls
+    global counter, game_state
     counter = 0
+    game_state = [[0 for _ in range(3)] for _ in range(3)]
     for i in range(3):
         for j in range(3):
-            lbl_ij = matrix_lbls[i][j]
-            lbl_ij.configure(image=image_ctk_white)
+            matrix_lbls[i][j].configure(image=image_ctk_white)
 
 
 ctk.set_appearance_mode("dark")
@@ -52,16 +62,13 @@ frame = ctk.CTkFrame(master=root)
 
 counter = 0
 
-rows, columns = 2, 1
+rows, columns = 2, 3
 for i in range(rows):
     root.rowconfigure(index=i, weight=1)
 for i in range(columns):
     root.columnconfigure(index=i, weight=1)
-frame.grid(row=0, column=0)
+frame.grid(row=0, column=1)
 
-# внутри рамки frame будет плитка из labels 2x3:
-
-# создание хендлеров для labels:
 matrix_handlers = []
 for i in range(3):
     tmp_lst = []
@@ -70,7 +77,8 @@ for i in range(3):
         tmp_lst.append(handler_ij)
     matrix_handlers.append(tmp_lst)
 
-# создание виджетов labels и привязка к ним изображений и хендлеров:
+game_state = [[0 for _ in range(3)] for _ in range(3)]
+
 matrix_lbls = []
 for i in range(3):
     tmp_lst = []
@@ -99,6 +107,20 @@ button.configure(
     text_color="white",
     fg_color="#f19c28",
     hover_color="#b27420"
+)
+button.configure(command=handler_reset)
+
+label = ctk.CTkLabel(master=root)
+label.configure(
+    text="Последняя победа: \n",
+    font=my_font,
+    text_color="white"
+)
+
+button.grid(row=1, column=1, pady=5)
+label.grid(rows=1, columns=3)
+root.mainloop()
+
 )
 button.configure(command=handler_reset)
 
